@@ -1,0 +1,17 @@
+{
+  "name": "cypress_api_automation",
+  "version": "1.0.0",
+  "description": "api automation Payment Integrator",
+  "main": "index.js",
+  "scripts": {
+    "test": "cypress open"
+  },
+  "keywords": [
+    "cypress"
+  ],
+  "author": "andika",
+  "license": "ISC",
+  "devDependencies": {
+    "cypress": "^12.17.1"
+  }
+}
