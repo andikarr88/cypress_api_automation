@@ -27,8 +27,6 @@ describe('GET Token', () => {
     });
 
     it('Token', () => {
-        const cypressGlobalSignature = Cypress.env('globalSignature');
-        cy.log('Cypress Global Signature:', cypressGlobalSignature);
         cy.request({
             method: 'POST',
             url: '/auth/login',
