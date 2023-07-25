@@ -54,4 +54,31 @@ describe('GET Token', () => {
             expect(token.body).to.have.property('accessToken')
         });
     });
+
+    it('Signature Inquiry', () => {
+        cy.request({
+            method: 'POST',
+            url: '/auth/signature/service',
+            headers: {
+                'Accept-Encoding': 'application/json', 
+                'Content-Type' : 'application/json',
+                'x-timestamp': Cypress.env('TIMESTAMP'),
+                'x-client-secret': Cypress.env('clientsecret'),
+                'httpmethod' : 'post',
+                'endpoinurl' : Cypress.env('endpointurlinquiry'),
+                'accesstoken': globalToken
+            }
+        }).as('signatureInquiry');
+        cy.get('@signatureInquiry').then(signatureInquiry =>{
+            expect(signatureInquiry.status).to.equal(200);
+            // Simpan nilai JSON body dalam variabel global
+            signatureInquiry = signatureInquiry.body.signature;
+            // Simpan nilai JSON body dalam environment variable Cypress
+            Cypress.env('signatureInquiry', signatureInquiry);
+        });
+        cy.get('@signatureInquiry').then((signatureInquiry) => {
+            cy.log(JSON.stringify(signatureInquiry.body)),
+            expect(signatureInquiry.body.responseCode).to.equal('00')
+        });
+    });
 })
