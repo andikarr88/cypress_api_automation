@@ -68,6 +68,7 @@ describe('GET Token', () => {
                 'endpoinurl' : Cypress.env('endpointurlinquiry'),
                 'accesstoken': globalToken
             }
+            //
         }).as('signatureInquiry');
         cy.get('@signatureInquiry').then(signatureInquiry =>{
             expect(signatureInquiry.status).to.equal(200);
