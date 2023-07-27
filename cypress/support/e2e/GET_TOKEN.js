@@ -1,5 +1,5 @@
 describe('GET Token', () => {    
-    let globalSignature, globalToken, signatureInquiry, inquiry;
+    let globalSignature, globalToken, globalSignatureInquiry;
     
     it('Signature Token', () => {
         cy.request({
@@ -72,11 +72,11 @@ describe('GET Token', () => {
                     "cardNumber": "0000000000000000",
                     "accountType": "10",
                     "transactionAmount": 20000,
-                    "transDateTime": "0725125934",
+                    "transDateTime": "0727085934",
                     "traceNumber": "000001",
-                    "localTime": "125934",
-                    "localDate": "0725",
-                    "settlementDate": "0726",
+                    "localTime": "085934",
+                    "localDate": "0727",
+                    "settlementDate": "0728",
                     "channelCode": "6017",
                     "posEntryMode": "999",
                     "acquirerID": "00000000119",
@@ -94,48 +94,49 @@ describe('GET Token', () => {
         cy.get('@signatureInquiry').then(signatureInquiry =>{
             expect(signatureInquiry.status).to.equal(200);
             // Simpan nilai JSON body dalam variabel global
-            signatureInquiry = signatureInquiry.body.signature;
+            globalSignatureInquiry = signatureInquiry.body.signature;
             // Simpan nilai JSON body dalam environment variable Cypress
-            Cypress.env('signatureInquiry', signatureInquiry);
+            Cypress.env('globalSignatureInquiry', globalSignatureInquiry);
         });
         cy.get('@signatureInquiry').then((signatureInquiry) => {
             cy.log(JSON.stringify(signatureInquiry.body))
+            expect(signatureInquiry.body).to.have.property('signature')
         });
     });
 
     it('Inquiry', () => {
         cy.request({
             method: 'POST',
-            url: '/jalin/openapi/payment/paymentinquiry',
+            url: Cypress.env('endpointurlinquiry'),
             headers: {
                 authorization: 'Bearer ' + globalToken,
                 'Accept-Encoding': 'application/json', 
                 'Content-Type' : 'application/json',
                 'x-timestamp': Cypress.env('TIMESTAMP'),                
-                'x-signature': signatureInquiry
+                'x-signature': globalSignatureInquiry
             },
             body: {
-                    "cardNumber": "0000000000000000",
-                    "accountType": "10",
-                    "transactionAmount": 20000,
-                    "transDateTime": "0725125934",
-                    "traceNumber": "000001",
-                    "localTime": "125934",
-                    "localDate": "0725",
-                    "settlementDate": "0726",
-                    "channelCode": "6017",
-                    "posEntryMode": "999",
-                    "acquirerID": "00000000119",
-                    "referenceNumber": "230725135934",
-                    "terminalID": "0000000000000003",
-                    "terminalNameLoc": "TEST MENARA DEA       JAKARTA SELAT068ID",
-                    "transactionData": "PI0501000CN24            081398776000PM0222",
-                    "currencyCode": "360",
-                    "nationalPmtData": "",
-                    "issuerCode": "00000000119",
-                    "transactionIndicator": "0",
-                    "destinationInstCode": "91800003500"
-            }
+                "cardNumber": "0000000000000000",
+                "accountType": "10",
+                "transactionAmount": 20000,
+                "transDateTime": "0727085934",
+                "traceNumber": "000001",
+                "localTime": "085934",
+                "localDate": "0727",
+                "settlementDate": "0728",
+                "channelCode": "6017",
+                "posEntryMode": "999",
+                "acquirerID": "00000000119",
+                "referenceNumber": "230725135934",
+                "terminalID": "0000000000000003",
+                "terminalNameLoc": "TEST MENARA DEA       JAKARTA SELAT068ID",
+                "transactionData": "PI0501000CN24            081398776000PM0222",
+                "currencyCode": "360",
+                "nationalPmtData": "",
+                "issuerCode": "00000000119",
+                "transactionIndicator": "0",
+                "destinationInstCode": "91800003500"
+        }
         }).as('inquiry');
         cy.get('@inquiry').then(inquiry =>{
             expect(inquiry.status).to.equal(200);
@@ -146,6 +147,7 @@ describe('GET Token', () => {
         });
         cy.get('@inquiry').then((inquiry) => {
             cy.log(JSON.stringify(inquiry.body))
+            expect(inquiry.body.responseCode).to.equal('00')
         });
     });
 })
