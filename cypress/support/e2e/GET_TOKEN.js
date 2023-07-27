@@ -1,4 +1,4 @@
-describe('GET Token', () => {    
+describe('Payment Integrator', () => {    
     let globalSignature, globalToken, globalSignatureInquiry;
     
     it('Signature Token', () => {
