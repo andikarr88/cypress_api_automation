@@ -1,6 +1,56 @@
+describe('Generate', () => {
+    it('Generates in the desired format', () => {
+      // Get the current date and time
+      const currentDate = new Date();
+      
+      // Format the date and time as per your desired format
+      const year = currentDate.getFullYear();
+      const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+      const day = String(currentDate.getDate()).padStart(2, '0');
+      const hours = String(currentDate.getHours()).padStart(2, '0');
+      const minutes = String(currentDate.getMinutes()).padStart(2, '0');
+      const seconds = String(currentDate.getSeconds()).padStart(2, '0');
+      const timeZoneOffset = currentDate.getTimezoneOffset();
+
+      const years = String(currentDate.getFullYear()).padStart(2, '0').slice(-2); // untuk ambil YY
+      const days = String(currentDate.getDate() + 1).padStart(2, '0'); // untuk DD +1
+      
+      // Calculate the timezone offset in the desired format (+/-HH:mm)
+      const timeZoneOffsetHours = Math.floor(Math.abs(timeZoneOffset) / 60);
+      const timeZoneOffsetMinutes = Math.abs(timeZoneOffset) % 60;
+      const timeZoneOffsetSign = timeZoneOffset >= 0 ? '+' : '-';
+      
+      // Create the in the desired format
+      const timestamp = `${year}-${month}-${day}T${hours}:${minutes}:${seconds}${timeZoneOffsetSign}${String(timeZoneOffsetHours).padStart(2, '0')}:${String(timeZoneOffsetMinutes).padStart(2, '0')}`;
+      const localdate = `${month}${day}`;
+      const localtime = `${hours}${minutes}${seconds}`
+      const transdatetime = `${localdate}`+`${localtime}`
+      const referencenumber = `${years}${month}${day}${hours}${minutes}${seconds}`
+      const settlementdate = `${month}${days}`;
+
+      // Log the generated 
+      cy.log(`Generated TIMESTAMP: ${timestamp}`);
+      cy.log(`Generated localdate: ${localdate}`);
+      cy.log(`Generated localtime: ${localtime}`);
+      cy.log(`Generated transdatetime: ${transdatetime}`);
+      cy.log(`Generated referencenumber: ${referencenumber}`);
+      cy.log(`Generated settlementdate: ${settlementdate}`);
+      
+      // Optionally, you can set the TIMESTAMP as an environment variable
+      Cypress.env('TIMESTAMP', timestamp);
+      Cypress.env('LOCALDATE', localdate);
+      Cypress.env('LOCALTIME', localtime);
+      Cypress.env('TRANSDATETIME', transdatetime);
+      Cypress.env('REFERENCENUMBER', referencenumber);
+      Cypress.env('SETTLEMENTDATE', settlementdate);
+
+    });
+
+  });
+
 describe('Payment Integrator', () => {    
     let globalSignature, globalToken, globalSignatureInquiry;
-    
+
     it('Signature Token', () => {
         cy.request({
             method: 'POST',
@@ -72,18 +122,18 @@ describe('Payment Integrator', () => {
                     "cardNumber": "0000000000000000",
                     "accountType": "10",
                     "transactionAmount": 20000,
-                    "transDateTime": "0727085934",
+                    "transDateTime": Cypress.env('TRANSDATETIME'),
                     "traceNumber": "000001",
-                    "localTime": "085934",
-                    "localDate": "0727",
-                    "settlementDate": "0728",
+                    "localTime": Cypress.env('LOCALTIME'),
+                    "localDate": Cypress.env('LOCALDATE'),
+                    "settlementDate": Cypress.env('SETTLEMENTDATE'),
                     "channelCode": "6017",
                     "posEntryMode": "999",
                     "acquirerID": "00000000119",
-                    "referenceNumber": "230725135934",
+                    "referenceNumber": Cypress.env('REFERENCENUMBER'),
                     "terminalID": "0000000000000003",
                     "terminalNameLoc": "TEST MENARA DEA       JAKARTA SELAT068ID",
-                    "transactionData": "PI0501000CN24            081398776000PM0222",
+                    "transactionData": "PI0501000CN24            081398776000PM0211",
                     "currencyCode": "360",
                     "nationalPmtData": "",
                     "issuerCode": "00000000119",
@@ -116,26 +166,26 @@ describe('Payment Integrator', () => {
                 'x-signature': globalSignatureInquiry
             },
             body: {
-                "cardNumber": "0000000000000000",
-                "accountType": "10",
-                "transactionAmount": 20000,
-                "transDateTime": "0727085934",
-                "traceNumber": "000001",
-                "localTime": "085934",
-                "localDate": "0727",
-                "settlementDate": "0728",
-                "channelCode": "6017",
-                "posEntryMode": "999",
-                "acquirerID": "00000000119",
-                "referenceNumber": "230725135934",
-                "terminalID": "0000000000000003",
-                "terminalNameLoc": "TEST MENARA DEA       JAKARTA SELAT068ID",
-                "transactionData": "PI0501000CN24            081398776000PM0222",
-                "currencyCode": "360",
-                "nationalPmtData": "",
-                "issuerCode": "00000000119",
-                "transactionIndicator": "0",
-                "destinationInstCode": "91800003500"
+                    "cardNumber": "0000000000000000",
+                    "accountType": "10",
+                    "transactionAmount": 20000,
+                    "transDateTime": Cypress.env('TRANSDATETIME'),
+                    "traceNumber": "000001",
+                    "localTime": Cypress.env('LOCALTIME'),
+                    "localDate": Cypress.env('LOCALDATE'),
+                    "settlementDate": Cypress.env('SETTLEMENTDATE'),
+                    "channelCode": "6017",
+                    "posEntryMode": "999",
+                    "acquirerID": "00000000119",
+                    "referenceNumber": Cypress.env('REFERENCENUMBER'),
+                    "terminalID": "0000000000000003",
+                    "terminalNameLoc": "TEST MENARA DEA       JAKARTA SELAT068ID",
+                    "transactionData": "PI0501000CN24            081398776000PM0211",
+                    "currencyCode": "360",
+                    "nationalPmtData": "",
+                    "issuerCode": "00000000119",
+                    "transactionIndicator": "0",
+                    "destinationInstCode": "91800003500"
         }
         }).as('inquiry');
         cy.get('@inquiry').then(inquiry =>{
