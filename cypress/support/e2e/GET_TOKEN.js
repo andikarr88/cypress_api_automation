@@ -27,6 +27,7 @@ describe('Generate', () => {
       const transdatetime = `${localdate}`+`${localtime}`
       const referencenumber = `${years}${month}${day}${hours}${minutes}${seconds}`
       const settlementdate = `${month}${days}`;
+      const referencenumber1 = `${years}${month}${days}${hours}${minutes}${seconds}`
 
       // Log the generated 
       cy.log(`Generated TIMESTAMP: ${timestamp}`);
@@ -35,6 +36,7 @@ describe('Generate', () => {
       cy.log(`Generated transdatetime: ${transdatetime}`);
       cy.log(`Generated referencenumber: ${referencenumber}`);
       cy.log(`Generated settlementdate: ${settlementdate}`);
+      cy.log(`Generated referencenumber1: ${referencenumber1}`);
       
       // Optionally, you can set the TIMESTAMP as an environment variable
       Cypress.env('TIMESTAMP', timestamp);
@@ -43,13 +45,12 @@ describe('Generate', () => {
       Cypress.env('TRANSDATETIME', transdatetime);
       Cypress.env('REFERENCENUMBER', referencenumber);
       Cypress.env('SETTLEMENTDATE', settlementdate);
-
+      Cypress.env('REFERENCENUMBER1', referencenumber1);
     });
-
-  });
+});
 
 describe('Payment Integrator', () => {    
-    let globalSignature, globalToken, globalSignatureInquiry;
+    let globalSignature, globalToken, globalSignatureInquiry, globalSignaturePayment, globalTransactionDataInquiryResponse, globalNationalPmtDataInquiryResponse;
 
     it('Signature Token', () => {
         cy.request({
@@ -129,14 +130,14 @@ describe('Payment Integrator', () => {
                     "settlementDate": Cypress.env('SETTLEMENTDATE'),
                     "channelCode": "6017",
                     "posEntryMode": "999",
-                    "acquirerID": "00000000119",
+                    "acquirerID": "00000000116",
                     "referenceNumber": Cypress.env('REFERENCENUMBER'),
                     "terminalID": "0000000000000003",
                     "terminalNameLoc": "TEST MENARA DEA       JAKARTA SELAT068ID",
                     "transactionData": "PI0501000CN24            081398776000PM0211",
                     "currencyCode": "360",
                     "nationalPmtData": "",
-                    "issuerCode": "00000000119",
+                    "issuerCode": "00000000116",
                     "transactionIndicator": "0",
                     "destinationInstCode": "91800003500"
             }
@@ -176,14 +177,14 @@ describe('Payment Integrator', () => {
                     "settlementDate": Cypress.env('SETTLEMENTDATE'),
                     "channelCode": "6017",
                     "posEntryMode": "999",
-                    "acquirerID": "00000000119",
+                    "acquirerID": "00000000116",
                     "referenceNumber": Cypress.env('REFERENCENUMBER'),
                     "terminalID": "0000000000000003",
                     "terminalNameLoc": "TEST MENARA DEA       JAKARTA SELAT068ID",
                     "transactionData": "PI0501000CN24            081398776000PM0211",
                     "currencyCode": "360",
                     "nationalPmtData": "",
-                    "issuerCode": "00000000119",
+                    "issuerCode": "00000000116",
                     "transactionIndicator": "0",
                     "destinationInstCode": "91800003500"
         }
@@ -198,6 +199,116 @@ describe('Payment Integrator', () => {
         cy.get('@inquiry').then((inquiry) => {
             cy.log(JSON.stringify(inquiry.body))
             expect(inquiry.body.responseCode).to.equal('00')
+        });
+        cy.get('@inquiry').then(inquiry =>{
+            // Simpan nilai JSON body dalam variabel global
+            globalTransactionDataInquiryResponse = inquiry.body.transactionData;
+            // Simpan nilai JSON body dalam environment variable Cypress
+            Cypress.env('globalTransactionDataInquiryResponse', globalTransactionDataInquiryResponse);
+            cy.log(`transactionData: ${globalTransactionDataInquiryResponse}`);
+        });
+        cy.get('@inquiry').then(inquiry =>{
+            // Simpan nilai JSON body dalam variabel global
+            globalNationalPmtDataInquiryResponse = inquiry.body.nationalPmtData;
+            // Simpan nilai JSON body dalam environment variable Cypress
+            Cypress.env('globalNationalPmtDataInquiryResponse', globalNationalPmtDataInquiryResponse);
+            cy.log(`nationalPmtData: ${globalNationalPmtDataInquiryResponse}`);
+        });
+    });
+
+    it('Signature Payment', () => {
+        cy.request({
+            method: 'POST',
+            url: '/auth/signature/service',
+            headers: {
+                'Accept-Encoding': 'application/json', 
+                'Content-Type' : 'application/json',
+                'x-timestamp': Cypress.env('TIMESTAMP'),
+                'x-client-secret': Cypress.env('clientsecret'),
+                'httpmethod' : 'post',
+                'endpoinurl' : Cypress.env('endpointurlpayment'),
+                'accesstoken': globalToken
+            },
+            body: {
+                    "cardNumber": "0000000000000000",
+                    "accountType": "10",
+                    "transactionAmount": 20000,
+                    "transDateTime": Cypress.env('TRANSDATETIME'),
+                    "traceNumber": "000001",
+                    "localTime": Cypress.env('LOCALTIME'),
+                    "localDate": Cypress.env('LOCALDATE'),
+                    "settlementDate": Cypress.env('SETTLEMENTDATE'),
+                    "channelCode": "6017",
+                    "posEntryMode": "999",
+                    "acquirerID": "00000000116",
+                    "referenceNumber": Cypress.env('REFERENCENUMBER1'),
+                    "terminalID": "0000000000000003",
+                    "terminalNameLoc": "TEST MENARA DEA       JAKARTA SELAT068ID",
+                    "transactionData": Cypress.env('globalTransactionDataInquiryResponse'),
+                    "currencyCode": "360",
+                    "nationalPmtData": Cypress.env('globalNationalPmtDataInquiryResponse'),
+                    "issuerCode": "00000000116",
+                    "transactionIndicator": "2",
+                    "destinationInstCode": "91800003500"
+            }
+        }).as('signaturePayment');
+        cy.get('@signaturePayment').then(signaturePayment =>{
+            expect(signaturePayment.status).to.equal(200);
+            // Simpan nilai JSON body dalam variabel global
+            globalSignaturePayment = signaturePayment.body.signature;
+            // Simpan nilai JSON body dalam environment variable Cypress
+            Cypress.env('globalSignaturePayment', globalSignaturePayment);
+        });
+        cy.get('@signaturePayment').then((signaturePayment) => {
+            cy.log(JSON.stringify(signaturePayment.body))
+            expect(signaturePayment.body).to.have.property('signature')
+        });
+    });
+
+    it('Payment', () => {
+        cy.request({
+            method: 'POST',
+            url: Cypress.env('endpointurlpayment'),
+            headers: {
+                authorization: 'Bearer ' + globalToken,
+                'Accept-Encoding': 'application/json', 
+                'Content-Type' : 'application/json',
+                'x-timestamp': Cypress.env('TIMESTAMP'),                
+                'x-signature': globalSignaturePayment
+            },
+            body: {
+                "cardNumber": "0000000000000000",
+                "accountType": "10",
+                "transactionAmount": 20000,
+                "transDateTime": Cypress.env('TRANSDATETIME'),
+                "traceNumber": "000001",
+                "localTime": Cypress.env('LOCALTIME'),
+                "localDate": Cypress.env('LOCALDATE'),
+                "settlementDate": Cypress.env('SETTLEMENTDATE'),
+                "channelCode": "6017",
+                "posEntryMode": "999",
+                "acquirerID": "00000000116",
+                "referenceNumber": Cypress.env('REFERENCENUMBER1'),
+                "terminalID": "0000000000000003",
+                "terminalNameLoc": "TEST MENARA DEA       JAKARTA SELAT068ID",
+                "transactionData": Cypress.env('globalTransactionDataInquiryResponse'),
+                "currencyCode": "360",
+                "nationalPmtData": Cypress.env('globalNationalPmtDataInquiryResponse'),
+                "issuerCode": "00000000116",
+                "transactionIndicator": "2",
+                "destinationInstCode": "91800003500"
+        }
+        }).as('payment');
+        cy.get('@payment').then(payment =>{
+            expect(payment.status).to.equal(200);
+            // Simpan nilai JSON body dalam variabel global
+            payment = payment.body;
+            // Simpan nilai JSON body dalam environment variable Cypress
+            Cypress.env('payment', payment);
+        });
+        cy.get('@payment').then((payment) => {
+            cy.log(JSON.stringify(payment.body))
+            expect(payment.body.responseCode).to.equal('00')
         });
     });
 })
