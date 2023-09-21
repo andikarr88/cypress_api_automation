@@ -65,15 +65,17 @@ describe('Payment Integrator', () => {
             }
         }).as('signatureToken');
         cy.get('@signatureToken').then(signatureToken =>{
+            expect(signatureToken.status).to.equal(200);
             // Simpan nilai JSON body dalam variabel global
             globalSignature = signatureToken.body.signature;
             // Simpan nilai JSON body dalam environment variable Cypress
             Cypress.env('globalSignature', globalSignature);
+        });
+        cy.get('@signatureToken').then(signatureToken =>{
             // menampilkan  body signature
             cy.log(JSON.stringify(signatureToken.body)),
             // assert expected
-            expect(signatureToken.body).to.have.property('signature'),
-            expect(signatureToken.status).to.equal(200);
+            expect(signatureToken.body).to.have.property('signature');
         });
     });
 
@@ -94,15 +96,17 @@ describe('Payment Integrator', () => {
             }
         }).as('token');
         cy.get('@token').then(token =>{
+            expect(token.status).to.equal(200);
             // Simpan nilai JSON body dalam variabel global
             globalToken = token.body.accessToken;
             // Simpan nilai JSON body dalam environment variable Cypress
             Cypress.env('globalToken', globalToken);
+        });
+        cy.get('@token').then(token =>{
             // menampilkan  body signature
-            cy.log(JSON.stringify(token.body)),
+            cy.log(JSON.stringify(token.body));
             // assert expected
-            expect(token.body).to.have.property('accessToken'),
-            expect(token.status).to.equal(200);
+            expect(token.body).to.have.property('accessToken');
         });
     });
 
@@ -143,15 +147,17 @@ describe('Payment Integrator', () => {
             }
         }).as('signatureInquiry');
         cy.get('@signatureInquiry').then(signatureInquiry =>{
+            expect(signatureInquiry.status).to.equal(200);
             // Simpan nilai JSON body dalam variabel global
             globalSignatureInquiry = signatureInquiry.body.signature;
             // Simpan nilai JSON body dalam environment variable Cypress
             Cypress.env('globalSignatureInquiry', globalSignatureInquiry);
+        });
+        cy.get('@signatureInquiry').then(signatureInquiry =>{
             // menampilkan  body
-            cy.log(JSON.stringify(signatureInquiry.body)),
+            cy.log(JSON.stringify(signatureInquiry.body));
             // assert expected
-            expect(signatureInquiry.body).to.have.property('signature'),
-            expect(signatureInquiry.status).to.equal(200);
+            expect(signatureInquiry.body).to.have.property('signature');
         });
     });
 
@@ -197,8 +203,8 @@ describe('Payment Integrator', () => {
             Cypress.env('inquiry', inquiry);
         });
         cy.get('@inquiry').then((inquiry) => {
-            cy.log(JSON.stringify(inquiry.body))
-            expect(inquiry.body.responseCode).to.equal('00')
+            cy.log(JSON.stringify(inquiry.body));
+            expect(inquiry.body.responseCode).to.equal('00');
         });
         cy.get('@inquiry').then(inquiry =>{
             // Simpan nilai JSON body dalam variabel global
@@ -253,15 +259,17 @@ describe('Payment Integrator', () => {
             }
         }).as('signaturePayment');
         cy.get('@signaturePayment').then(signaturePayment =>{
+            expect(signaturePayment.status).to.equal(200);
             // Simpan nilai JSON body dalam variabel global
             globalSignaturePayment = signaturePayment.body.signature;
             // Simpan nilai JSON body dalam environment variable Cypress
             Cypress.env('globalSignaturePayment', globalSignaturePayment);
+        });
+        cy.get('@signaturePayment').then(signaturePayment =>{
             // menampilkan body
-            cy.log(JSON.stringify(signaturePayment.body)),
+            cy.log(JSON.stringify(signaturePayment.body));
             // assert expected
-            expect(signaturePayment.body).to.have.property('signature'),
-            expect(signaturePayment.status).to.equal(200);
+            expect(signaturePayment.body).to.have.property('signature');
         });
     });
 
@@ -307,8 +315,8 @@ describe('Payment Integrator', () => {
             Cypress.env('payment', payment);
         });
         cy.get('@payment').then((payment) => {
-            cy.log(JSON.stringify(payment.body))
-            expect(payment.body.responseCode).to.equal('00')
+            cy.log(JSON.stringify(payment.body));
+            expect(payment.body.responseCode).to.equal('00');
         });
     });
 })
