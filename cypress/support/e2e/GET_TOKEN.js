@@ -14,6 +14,7 @@ describe('Generate', () => {
 
       const years = String(currentDate.getFullYear()).padStart(2, '0').slice(-2); // untuk ambil YY
       const days = String(currentDate.getDate() + 1).padStart(2, '0'); // untuk DD +1
+      const secondss = String(currentDate.getSeconds() + 1).padStart(2, '0'); // untuk second +1
       
       // Calculate the timezone offset in the desired format (+/-HH:mm)
       const timeZoneOffsetHours = Math.floor(Math.abs(timeZoneOffset) / 60);
@@ -27,7 +28,7 @@ describe('Generate', () => {
       const transdatetime = `${localdate}`+`${localtime}`
       const referencenumber = `${years}${month}${day}${hours}${minutes}${seconds}`
       const settlementdate = `${month}${days}`;
-      const referencenumber1 = `${years}${month}${days}${hours}${minutes}${seconds}`
+      const referencenumber1 = `${years}${month}${day}${hours}${minutes}${secondss}`
 
       // Log the generated 
       cy.log(`Generated TIMESTAMP: ${timestamp}`);
