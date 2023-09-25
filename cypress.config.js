@@ -7,8 +7,9 @@ module.exports = defineConfig({
     reporterOptions: {
       reportDir: 'cypress/results',
       overwrite: false,
-      html: false,
-      json: true,
+      html: true,
+      json: false,
+
     },
     baseUrl: 'http://10.132.128.4:8088',
     specPattern: "cypress/support/e2e",
