@@ -12,9 +12,13 @@
   "author": "andika",
   "license": "ISC",
   "devDependencies": {
-    "cypress": "^12.17.1"
-  },
-  "dependencies": {
-    "mocha": "^10.2.0"
+    "cypress": "^13.2.0",
+    "cypress-mochawesome-reporter": "^3.6.0",
+    "cypress-multi-reporters": "^1.6.3",
+    "mocha": "^10.2.0",
+    "mocha-junit-reporter": "^2.2.1",
+    "mochawesome": "^7.1.3",
+    "mochawesome-merge": "^4.3.0",
+    "mochawesome-report-generator": "^6.2.0"
   }
 }
